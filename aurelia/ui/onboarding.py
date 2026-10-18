@@ -25,10 +25,12 @@ STEPS = [
      "restore or reset.</p>"),
     ("Set up your workspace", ""),
     ("Where to start",
-     "<ol><li><b>Dashboard</b> – read the current business position.</li>"
-     "<li><b>Scenario Lab</b> – change a room rate, a demand assumption and a cost, and watch EBITDA and cash "
-     "move.</li><li><b>Learning Path</b> – Stage 1 explains the drivers you just changed and checks your "
-     "understanding with live numbers.</li></ol>"
+     "<ol><li><b>Command Center</b> – your season at a glance: the next month, the owners' confidence and "
+     "your objectives.</li>"
+     "<li><b>Run the Month</b> – read the briefing, set rates, staffing and marketing, then close the month and "
+     "see what happened and why. Twelve months make a season.</li>"
+     "<li><b>Academy</b> – short lessons with worked examples from the same engine, so the next turn goes "
+     "better.</li></ol>"
      "<p>Shortcuts: <b>Ctrl+K</b> search · <b>Ctrl+S</b> save scenario · <b>Ctrl+Z / Ctrl+Y</b> undo/redo · "
      "<b>Ctrl+T</b> theme · <b>Ctrl+1…9</b> pages · <b>F1</b> help.</p>"),
 ]

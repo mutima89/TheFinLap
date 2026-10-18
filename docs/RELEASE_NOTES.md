@@ -1,5 +1,29 @@
 # Release notes
 
+## 1.1.0 (2026-10-18)
+
+A redesign of how the app looks and how you play it. The engine, analysis and learning content are unchanged.
+
+**Season mode (new)**
+* Run The Aurelia Grand for FY2027, one month per turn: market briefing and decision cards, rate position per
+  segment, staffing and marketing levers, a live low / likely / high projection against budget, then a month close
+  with an exact budget-to-actual EBITDA bridge, measured vs unexplained notes, the owner's reaction and carried
+  risks.
+* Owner confidence, guest score, the lenders' cash floor, quarterly objectives, achievements, XP and a six-step
+  title ladder; a graded season review after December. Progress is saved locally.
+* New **Command Center** home screen with the next turn, season KPIs, objectives, the owner's view and the next
+  lesson.
+
+**Design**
+* New visual identity: deep night palette with champagne gold (and an ivory light theme), Fraunces display and
+  Manrope interface typefaces bundled under the SIL Open Font License, a consistent stroke icon set, painted
+  sparklines, rings, progress lines, bridge and range charts.
+* Navigation regrouped into Play, Analyse, Learn and Workspace; a top bar showing season progress, cash, guest
+  score and confidence; a career card in the sidebar.
+* Cleaner tables (no gridlines, right-aligned numbers) and restyled charts, cards, tabs, sliders and inputs across
+  every page.
+
+
 ## 1.0.0 (2026-10-17)
 
 First complete release.

@@ -18,6 +18,7 @@
 ```
             ┌──────────────────────────────────────────────────────────────┐
   UI        │ ui/main_window.py  ui/pages/*  ui/widgets.py  ui/theme.py    │  PySide6, Matplotlib
+            │ ui/visuals.py  ui/icons.py  ui/chrome.py (painted, QtSvg)    │
             │ ui/state.py (AppState: working draft, undo/redo, signals)    │
             └───────────────▲──────────────────────────────▲───────────────┘
                             │ reads results                │ change driver / save
@@ -26,6 +27,7 @@
             │ fpa, sensitivity,         │   │ coach, glossary              │
             │ investment, decisions,    │   │ excel/ formula, workbooks,   │
             │ capstone                  │   │ grader                       │
+            │ game/ season, events      │   │                              │
             │ reports/ management_report│   │                              │
             │ excel_export, portfolio   │   │                              │
             └───────────────▲───────────┘   └──────────────▲───────────────┘
@@ -52,6 +54,23 @@
   detail, warnings and the 14 integrity checks. `simulate_cached` memoises on the canonical JSON of the
   assumptions.
 * Financing and tax run in a single forward loop using opening balances, so there are no circular references.
+
+## Season mode
+
+`aurelia/game/season.py` turns the engine into a twelve-turn game. Each month's assumption tree is the Base case
+plus the player's levers, the effects of that month's briefing cards (`game/events.py`), effects carried from
+earlier months and any deferred risk that has materialised. The full engine runs on that tree and only month *m* of
+model year 1 is read, so every figure in the game passes the same integrity checks as the rest of the app. The
+budget is the Base case with standard levers and no noise; the projection uses expected demand; the actual adds the
+engine's seeded demand noise. The bridge from budget to actual is built so its steps sum exactly to the variance.
+Season state is stored as JSON in the settings table under `season_v1`.
+
+## Design system
+
+`ui/theme.py` defines the dark and light palettes, registers the bundled fonts (Manrope for the interface, Fraunces
+for display headings, both SIL OFL) with Qt and Matplotlib, and generates the application style sheet. `ui/icons.py`
+renders a stroke SVG icon set with QtSvg; `ui/visuals.py` holds painted widgets (sparkline, ring, progress line,
+month track, season bars, EBITDA bridge, range bar, hero panel, avatar) so key visuals do not depend on Matplotlib.
 
 ## Application state
 

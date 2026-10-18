@@ -9,8 +9,10 @@ figures are fictional training data, not industry benchmarks.
 The first time the app opens, a short tour explains what is fictional, where your data is stored and lets you
 pick the theme and currency. You can replay it from **Settings and Data → Show welcome tour again**.
 
-The window has a navigation list on the left (grouped Business, Analysis, Practice, Output), a search box at the
-top, the working scenario name, a currency selector (SAR or USD) and a theme button.
+The window has a navigation list on the left (grouped Play, Analyse, Learn, Workspace) with your career title and
+XP at the bottom, and a top bar with search, your season progress (one pill per month, coloured by result), cash,
+guest score, owner confidence, a currency selector (SAR or USD) and a theme button. The app opens on the
+**Command Center**.
 
 | Shortcut | Action |
 |---|---|
@@ -23,7 +25,7 @@ top, the working scenario name, a currency selector (SAR or USD) and a theme but
 
 ## 2. Suggested route
 
-1. Read the **Dashboard**.
+1. Play your first month in **Run the Month** (see below), then read the **Hotel Dashboard**.
 2. In the **Scenario Lab**, change a room rate, a demand assumption and a cost; watch revenue, EBITDA and cash move.
 3. Start **Learning Path → Stage 1**. Each topic ends with an applied task and a competency check; when every
    topic of a stage has both, the next stage unlocks.
@@ -32,9 +34,47 @@ top, the working scenario name, a currency selector (SAR or USD) and a theme but
 5. Practise judgement in the **Executive Decision Room**, then complete the **Capstone**.
 6. Export your **portfolio** from Reports.
 
-## 3. Business pages
+## 3. Season mode
 
-### Dashboard
+### Command Center
+The home screen. It shows your next turn and what is on your desk, EBITDA, RevPAR and occupancy to date against
+budget (with a small trend line per month), cash against the lenders' floor, the season so far as monthly bars
+against budget, this quarter's objectives, the asset manager's latest comment and the next lesson to study.
+
+### Run the Month
+A season is FY2027, played one month per turn.
+
+* **Briefing.** One market card (an event, a competitor, a demand shift) and one or two decision or issue cards.
+  Each choice shows a short hint; you must answer every card before you can close the month. Some choices create a
+  risk that may come back as a consequence card in a later month.
+* **Levers.** Rate position against the market for each of the five segments (−20% to +20%), staffing (lean,
+  standard, premium) and the month's marketing spend. Staffing changes payroll and the guest score; marketing lifts
+  direct bookings, mostly in the following month.
+* **Projected month.** A low / likely / high EBITDA range against the month's budget, plus occupancy, ADR, RevPAR,
+  closing cash and guest score. The projection uses expected demand; the range shows a soft and a strong month.
+* **Close the month.** The engine runs the month again with the seeded day-to-day demand variation you could not
+  know in advance. The month close shows the verdict (beat, on or missed budget), a bridge from budget to actual
+  EBITDA whose steps add up exactly, a note separating what the model **measured** from what is still
+  **unexplained** (it never invents a cause), the owner's reaction, anything carried into next month, achievements
+  and XP.
+
+Owner confidence rises when you beat budget and falls when you miss it by more than 1% or the guest score drops. If
+cash falls below the lenders' floor (SAR 20m) the season ends early. Each quarter has objectives (EBITDA against
+budget, direct-booking share, the cash floor and the guest score). XP from months, objectives and Academy checks
+moves you up the title ladder: Finance Trainee, Revenue Analyst I and II, Finance Manager, Director of Finance and
+Area CFO.
+
+After December, the **season review** gives a grade, season EBITDA against budget, your best and toughest month,
+objectives met, final confidence and guest score, and the year month by month. **Start a new season** keeps your XP
+and title.
+
+Season limitation: each month is simulated from the Base case opening balance sheet, so the season tracks cash
+itself as opening cash plus each month's net cash flow. Working-capital timing of earlier decisions is not carried
+from one month to the next.
+
+## 4. Business pages
+
+### Hotel Dashboard
 Eight KPI cards (occupancy, ADR, RevPAR, total revenue, GOP, EBITDA, net income, closing cash) for the chosen
 period, compared with the comparison scenario. Click a card to open the analysis behind it. Charts show revenue
 and EBITDA by month, occupancy/ADR/RevPAR, departmental contribution and cash/debt. Panels show the budget and
@@ -76,7 +116,7 @@ USALI-style operating statement, income statement, balance sheet, cash flow stat
 bridge, monthly or annual. The **Integrity checks** tab shows the 14 checks run on every calculation (balance
 sheet balances, cash and debt roll-forwards, segment and departmental reconciliations, room inventory).
 
-## 4. Analysis pages
+## 5. Analysis pages
 
 ### Modelling Workbench
 Models A–H (revenue drivers, departmental profit, operating statement, three statements, 36-month forecast,
@@ -96,9 +136,9 @@ with and without the project and turns the difference into after-tax incremental
 (with a warning for multiple or missing IRRs), MIRR, payback, discounted payback, profitability index and
 sensitivities. Every parameter is editable.
 
-## 5. Practice pages
+## 6. Practice pages
 
-### Executive Decision Room
+### Boardroom Cases (Executive Decision Room)
 Nine cases, each taken through seven steps:
 
 1. **Inspect the evidence** (KPIs and case-specific tables).
@@ -115,7 +155,7 @@ investigate next. Several options are defensible in most cases; stating the cond
 right earns credit. The rubric is rule-based: it checks structure, numbers, drivers and risk language and cannot
 judge prose like a person.
 
-### Learning Path
+### Academy (Learning Path)
 Nine stages: financial literacy and operating drivers; Excel analysis and model construction; hotel revenue
 management; management accounting and variances; budgeting and rolling forecasts; financial statement modelling
 and cash flow; investment appraisal and scenarios; commercial finance and business partnering; executive
@@ -158,7 +198,7 @@ financial analysis, evaluate two investments, quantify risk, design an owner das
 recommendation, and defend it in a meeting. Each step is scored and saved; the overall score appears when all ten
 are submitted. *Export the dataset* writes the CSV files.
 
-## 6. Reports
+## 7. Reports
 * **Monthly management report** with seven sections: executive summary; actual, budget and forecast; material
   variances; evidence-supported explanations; forward-looking risks; recommended corrective actions; action owners
   and due dates. Preview, then save as HTML or PDF. Actions come from the FP&A action plans; suggested actions
@@ -168,14 +208,14 @@ are submitted. *Export the dataset* writes the CSV files.
   rationale, workbook grades, capstone results, action plans and forecast versions, as HTML, PDF and JSON, with the
   statement that it is practice feedback, not a qualification.
 
-## 7. Settings and Data
+## 8. Settings and Data
 * Theme, currency (USD uses the fixed fictional rate in the assumptions), FP&A close month and materiality.
 * **Your data**: the folder path, *Open folder*, **Back up** (one `.db` file), **Restore** (the backup is
   validated first, you confirm, and a safety copy of current data is made), **Export/Import scenarios** (JSON).
 * **Integrity check**: database checks plus the 14 model checks for every saved scenario.
 * **Reset all data**: confirm, then type `RESET`. A safety backup is written first.
 
-## 8. Where your data is
+## 9. Where your data is
 
 `%APPDATA%\AureliaFinanceLab\` on Windows (for example `C:\Users\<you>\AppData\Roaming\AureliaFinanceLab`):
 `aurelia.db` (everything), `graded\` (copies of workbooks you graded), `diagnostics\` (self-test reports) and any

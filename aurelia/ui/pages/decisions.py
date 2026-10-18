@@ -12,6 +12,7 @@ from ...analysis import decisions as D
 from ...learning import progress as P
 from ...persistence.db import now
 from ..common import formatters
+from .. import icons, theme
 from ..widgets import Page, card, label, button, Table, error, confirm
 
 
@@ -132,9 +133,10 @@ class DecisionPage(Page):
         self.list.clear()
         for c in D.CASES:
             best = P.best_decision_score(self.state.db, c.id)
-            mark = "✓ " if best is not None else "○ "
-            it = QListWidgetItem(f"{mark}{c.title}\n   {c.category}" + (f" · best {best:.0f}" if best is not None
-                                                                           else ""))
+            pal = theme.current()
+            ic = icons.icon("check" if best is not None else "boardroom", pal.good if best is not None else pal.muted, 16)
+            it = QListWidgetItem(ic, f"{c.title}\n{c.category}" + (f" · best {best:.0f}" if best is not None
+                                                                    else ""))
             it.setData(Qt.UserRole, c.id)
             self.list.addItem(it)
         self.list.blockSignals(False)

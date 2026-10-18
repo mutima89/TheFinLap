@@ -269,6 +269,16 @@ def _privacy_checks() -> str:
     return f"{len(loaded)} non-UI modules checked: no networking imports; no accounts, analytics or credentials."
 
 
+def _season_checks() -> str:
+    from .game import season as S
+    sn = S.new_season(7)
+    rec = S.close_month(sn, S.Levers())
+    _ensure(sn.month == 2, "season did not advance after closing a month")
+    gap = sum(v for _, v in rec.bridge) - (rec.actual["ebitda"] - rec.budget["ebitda"])
+    _ensure(abs(gap) < 1, f"month-close bridge does not add up (gap {gap:,.2f})")
+    return f"Played one month of a seeded season; EBITDA SAR {rec.actual['ebitda'] / 1e6:,.2f}m, bridge reconciles."
+
+
 def _ui_checks() -> str:
     from PySide6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication(sys.argv[:1])
@@ -292,12 +302,17 @@ def _ui_checks() -> str:
             win.toggle_theme()
             win.toggle_theme()
             win.close()
+            from PySide6.QtGui import QFontDatabase
+            from .ui import icons
+            fams = set(QFontDatabase.families())
+            _ensure({"Manrope", "Fraunces"} <= fams, "bundled fonts did not load")
+            _ensure(not icons.pixmap("home", "#D9B66F", 16).isNull(), "icon rendering failed")
             _ensure(not bad, f"pages failed: {bad}")
             pdf = save_pdf(build_report(build_fpa(baseline(), actual_world_assumptions())), d / "r.pdf")
             _ensure(Path(pdf).read_bytes()[:4] == b"%PDF", "PDF export failed")
         finally:
             db.close()
-    return f"All {len(PAGES)} pages loaded, theme toggled, management report PDF rendered."
+    return f"All {len(PAGES)} pages loaded, fonts and icons rendered, theme toggled, management report PDF rendered."
 
 
 CHECKS: list[tuple[str, str, Callable[[], str], bool]] = [
@@ -310,6 +325,7 @@ CHECKS: list[tuple[str, str, Callable[[], str], bool]] = [
     ("Calculations", "Engine integrity checks (all reference scenarios)", _engine_checks, False),
     ("Analysis", "FP&A variances and explanations", _fpa_checks, False),
     ("Analysis", "Decision Room cases", _decision_checks, False),
+    ("Game", "Season month close", _season_checks, False),
     ("Learning", "Learning path content and answer keys", _learning_checks, False),
     ("Learning", "Capstone dataset", _capstone_checks, False),
     ("Excel", "Formula calculator, workbooks and grading", _excel_checks, False),
