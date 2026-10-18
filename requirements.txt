@@ -1,0 +1,6 @@
+# Runtime dependencies (pinned). Verified to resolve to binary wheels for Windows x64 / CPython 3.12.
+PySide6==6.8.1
+pandas==3.0.5
+numpy==2.5.3
+matplotlib==3.11.2
+openpyxl==3.1.5

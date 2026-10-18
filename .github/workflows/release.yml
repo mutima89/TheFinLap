@@ -1,0 +1,91 @@
+name: Windows build and release
+
+# Builds the Windows .exe with build_windows.ps1 (tests -> PyInstaller -> exe self-test -> zip).
+# A version tag (v*) publishes the zip as a GitHub Release; a manual run only uploads it as a workflow artifact.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: py
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: x64
+
+      - name: Build, test and self-test the executable
+        shell: pwsh
+        run: .\build_windows.ps1 -Python "${{ steps.py.outputs.python-path }}"
+
+      - name: Collect release files
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force release | Out-Null
+          Copy-Item dist\*.zip, dist\SHA256SUMS.txt, build\BUILD_RESULT.txt, build\exe-selftest-report.txt release\
+          Get-ChildItem release | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Aurelia_Finance_Lab-win64
+          path: release/*
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-logs
+          path: |
+            build/test-output.txt
+            build/test-results.xml
+            build/exe-selftest-report.txt
+            build/BUILD_RESULT.txt
+          if-no-files-found: ignore
+
+      - name: Write release notes
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $result = Get-Content build\BUILD_RESULT.txt -Raw
+          @"
+          ## Download
+
+          1. Download **$((Get-ChildItem release\*.zip).Name)** below.
+          2. Right-click it, choose **Extract All…**, open the ``Aurelia_Finance_Lab`` folder.
+          3. Double-click **Aurelia_Finance_Lab.exe**. No installer or Python required (Windows 10/11, 64-bit).
+
+          The executable is not code-signed: if SmartScreen appears, choose **More info → Run anyway**.
+
+          ## How this build was verified
+
+          Built on a GitHub-hosted Windows runner by ``build_windows.ps1``: the full test suite ran on Windows, then
+          the built executable ran its own self-test against a fresh data folder before packaging.
+
+          ``````
+          $result
+          ``````
+
+          See [release notes](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/docs/RELEASE_NOTES.md)
+          for what is in this version. All data in the app is fictional; scores are practice feedback, not a
+          qualification.
+          "@ -replace '(?m)^          ', '' | Set-Content -Encoding utf8 release-notes.md
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Aurelia Finance Lab ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: |
+            release/*.zip
+            release/SHA256SUMS.txt
+            release/BUILD_RESULT.txt
+            release/exe-selftest-report.txt
