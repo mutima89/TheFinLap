@@ -44,4 +44,5 @@ First complete release.
 * Pinned dependencies with a Windows/Python 3.12 lock file; PyInstaller spec; `build_windows.bat` /
   `build_windows.ps1` that test, build, self-test the executable and package it.
 
-**Not included in this release:** a Windows executable built by the release author (see KNOWN_LIMITATIONS.md).
+**Windows download:** `Aurelia_Finance_Lab-1.0.0-win64.zip` on the GitHub Release, built by the release workflow on a
+Windows runner after the tests and the executable's self-test passed (see BUILD_AND_VERIFICATION_REPORT.md).

@@ -1,8 +1,9 @@
 # Building the Windows executable
 
-The release was prepared on Linux, which cannot produce a Windows `.exe` with PyInstaller (PyInstaller only
-builds for the operating system it runs on). These are the exact steps to produce and check the executable on
-a Windows PC. The build script stops at the first failure and only prints `BUILD SUCCEEDED` after the tests
+Most people should simply download the ready-made zip from the
+[latest release](https://github.com/mutima89/TheFinLap/releases/latest), which GitHub Actions builds on a Windows
+runner with this same script. These are the exact steps to produce and check the executable yourself on a
+Windows PC. The build script stops at the first failure and only prints `BUILD SUCCEEDED` after the tests
 and the built executable's own self-test have passed.
 
 ## Requirements

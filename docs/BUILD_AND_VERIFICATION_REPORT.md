@@ -12,14 +12,32 @@ Aurelia Finance Lab 1.0.0 · report date 2026-10-18
 | PyInstaller spec | Trial-built on **Linux** with PyInstaller 6.22.3; the frozen Linux application passed its full self-test (14/14, including every page and PDF export) and the UI smoke test |
 | Pinned dependencies | All 32 packages in `requirements-lock.txt` resolved to binary wheels for **Windows x64 / CPython 3.12** (`pip download --platform win_amd64 --python-version 3.12 --only-binary=:all:`) |
 | Windows build scripts | `build_windows.bat` and `build_windows.ps1` written; the PowerShell script parses without errors in PowerShell 7.4.6 |
-| **Windows `.exe`** | **Not built and not tested.** The release environment is Linux, and PyInstaller cannot cross-compile a Windows executable. No claim is made that a Windows executable exists or works. |
+| **Windows `.exe`** | **Built and self-tested on Windows by GitHub Actions.** `build_windows.ps1` ran end to end on a GitHub-hosted Windows Server 2022 runner: 166 tests passed on Windows, PyInstaller built the exe, and the built exe's `--selftest` passed (14/14 checks, including every page and PDF export). Each GitHub Release is produced by the same workflow and carries its own `BUILD_RESULT.txt`, self-test report and SHA-256 checksums. Not yet tried by a person on a desktop Windows 10/11 PC (see *Not verified*). |
 
-## Why there is no .exe in this release
+## How the Windows .exe is produced
 
-PyInstaller produces executables only for the operating system it runs on. The release was prepared in a Linux
-container with no Windows machine available. As the build brief requires, the release therefore contains the
-complete source and a reproducible Windows build, and states this limitation here, in the README, in the release
-notes and in KNOWN_LIMITATIONS.md.
+PyInstaller only builds for the operating system it runs on, and the release was prepared in a Linux container.
+The Windows build therefore runs in GitHub Actions ([`.github/workflows/release.yml`](../.github/workflows/release.yml))
+on a GitHub-hosted Windows runner, using exactly the same `build_windows.ps1` a user would run. The workflow only
+publishes a release if the tests, the build and the built executable's self-test all pass.
+
+### First Windows verification run (2026-10-18)
+
+Workflow run [39094902852](https://github.com/mutima89/TheFinLap/actions/runs/39094902852), commit `84f2b06`:
+
+```
+Aurelia Finance Lab 1.0.0 - Windows build result
+Machine:      Microsoft Windows NT 10.0.20348.0, AMD64
+Python:       Python 3.12.10
+PyInstaller:  6.22.3
+Tests:        166 passed in 46.49s
+Exe:          dist\Aurelia_Finance_Lab\Aurelia_Finance_Lab.exe
+Exe self-test: PASSED (report: build\exe-selftest-report.txt)
+Package:      dist\Aurelia_Finance_Lab-1.0.0-win64.zip (about 90 MB)
+```
+
+The published v1.0.0 release was rebuilt by the same workflow from the tagged commit; its own `BUILD_RESULT.txt`
+and checksums are attached to the release.
 
 ## Exact steps to produce and verify the .exe on Windows
 
@@ -71,15 +89,15 @@ keyboard-mnemonic underscores in labels) were fixed.
 
 | | Version |
 |---|---|
-| OS | Linux 6.18 x86_64 (container) |
-| Python | 3.12.3 (pinned dependency set) and 3.13.16 |
+| OS | Linux 6.18 x86_64 (container); Windows Server 2022 (GitHub Actions runner) for the Windows build |
+| Python | 3.12.3 (pinned dependency set) and 3.13.16 on Linux; 3.12.10 on Windows |
 | PySide6 / pandas / NumPy / Matplotlib / openpyxl | 6.8.1 / 3.0.5 / 2.5.3 / 3.11.2 / 3.1.5 |
 | pytest / pytest-qt / PyInstaller | 9.1.1 / 4.5.0 / 6.22.3 |
 
 ## Not verified
 
-* The Windows executable, its start-up, appearance with Windows fonts and DPI scaling, SmartScreen behaviour and
-  file dialogs on Windows.
+* Hands-on use of the Windows executable by a person on a desktop Windows 10/11 PC: appearance with Windows fonts
+  and DPI scaling, SmartScreen behaviour and native file dialogs. The CI self-test opens every page and exports a
+  PDF inside the built exe, but nobody has looked at the screen.
 * Opening the generated workbooks in Microsoft Excel itself (they were checked with openpyxl and the app's own
   calculator, and reference formulas were confirmed to produce the expected values).
-* Running `build_windows.ps1` end to end (it was parse-checked only).

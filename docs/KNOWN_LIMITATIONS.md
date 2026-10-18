@@ -2,11 +2,10 @@
 
 ## Release and platform
 
-* **The Windows executable was not built or run by the author of this release.** The release was prepared on
-  Linux, where PyInstaller cannot produce Windows executables. The source, the PyInstaller spec and the build
-  scripts are complete, and the same spec was trial-built on Linux, where the frozen app passed its full
-  self-test. A Windows build must be produced and checked with `build_windows.bat`, which runs the tests and the
-  built executable's self-test (see BUILD_WINDOWS.md and BUILD_AND_VERIFICATION_REPORT.md).
+* **The Windows executable is built and self-tested automatically, not by hand.** Releases come from a GitHub
+  Actions workflow on a Windows Server 2022 runner, which runs the tests, builds with PyInstaller and runs the
+  built executable's self-test. It has not yet been tried by a person on a desktop Windows 10/11 PC, so display
+  scaling and font rendering on your screen are unverified.
 * The executable is not code-signed, so SmartScreen may warn on first run.
 * Dependencies are pinned and verified for 64-bit Python 3.12 on Windows. Other Python versions are not
   supported by the build script.
