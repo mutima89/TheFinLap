@@ -6,13 +6,14 @@ from PySide6.QtWidgets import (QButtonGroup, QFrame, QGridLayout, QHBoxLayout, Q
                                QStackedWidget, QVBoxLayout, QWidget)
 
 from ...game import season as S
-from ...model.assumptions import SEGMENT_LABELS
+from ...model.assumptions import SEGMENT_LABELS, SEGMENTS
 from .. import icons, theme
 from ..chrome import MONTHS
 from ..visuals import Avatar, BridgeChart, Hero, RangeBar, short_money
-from ..widgets import card, confirm, label
+from ..widgets import card, clear_layout, confirm, label
 
-KIND_CHIP = {"market": ("MARKET", "ChipBlue"), "decision": ("DECIDE", "ChipGold"), "issue": ("ISSUE", "ChipBad")}
+KIND_CHIP = {"market": ("MARKET", "ChipBlue"), "decision": ("DECIDE", "ChipGold"), "issue": ("ISSUE", "ChipBad"),
+             "consequence": ("CONSEQUENCE", "ChipBad")}
 STAFFING = [("lean", "Lean"), ("standard", "Standard"), ("premium", "Premium")]
 
 
@@ -24,13 +25,7 @@ def _scroll(widget: QWidget) -> QScrollArea:
     return sa
 
 
-def _clear(lay) -> None:
-    while lay.count():
-        it = lay.takeAt(0)
-        if it.widget():
-            it.widget().deleteLater()
-        elif it.layout():
-            _clear(it.layout())
+_clear = clear_layout
 
 
 def _hrule() -> QFrame:
@@ -65,7 +60,7 @@ class BriefCard(QFrame):
             row = QGridLayout()
             row.setSpacing(8)
             for i, ch in enumerate(c.choices):
-                cid, lab_, hint = ch[0], ch[1], (ch[2] if len(ch) > 2 else "")
+                cid, lab_, hint = ch.id, ch.label, ch.hint
                 b = QPushButton(lab_)
                 b.setObjectName("Choice")
                 b.setCheckable(True)
@@ -95,7 +90,7 @@ class LeverRow(QWidget):
         h.setContentsMargins(0, 0, 0, 0)
         h.setSpacing(14)
         lab_ = label(text)
-        lab_.setFixedWidth(170)
+        lab_.setFixedWidth(150)
         h.addWidget(lab_)
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(-20, 20)
@@ -105,7 +100,7 @@ class LeverRow(QWidget):
         self.slider.setAccessibleName(f"{text} rate against market")
         h.addWidget(self.slider, 1)
         self.out = label("")
-        self.out.setFixedWidth(84)
+        self.out.setFixedWidth(76)
         self.out.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         h.addWidget(self.out)
         self.slider.valueChanged.connect(lambda v: (self._show(v), on_change()))
@@ -150,7 +145,7 @@ class SeasonPage(QWidget):
     # ---- turn view -------------------------------------------------------------------------
     def _build_turn(self):
         v = QVBoxLayout(self.turn)
-        v.setContentsMargins(32, 22, 32, 28)
+        v.setContentsMargins(28, 22, 28, 28)
         v.setSpacing(18)
         head = QHBoxLayout()
         head.setSpacing(16)
@@ -167,7 +162,7 @@ class SeasonPage(QWidget):
         cols.setSpacing(22)
         # briefing
         bw = QWidget()
-        bw.setFixedWidth(430)
+        bw.setFixedWidth(380)
         self.brief = QVBoxLayout(bw)
         self.brief.setContentsMargins(0, 0, 0, 0)
         self.brief.setSpacing(14)
@@ -176,10 +171,11 @@ class SeasonPage(QWidget):
         # levers
         lv, ll = card(margins=24, spacing=16)
         lh = QHBoxLayout()
-        lh.addWidget(label("Your levers", "H2"))
-        lh.addSpacing(8)
-        lh.addWidget(label("Room rates are set against the market for each segment", "Muted"), 0, Qt.AlignBottom)
-        lh.addStretch(1)
+        lv_t = QVBoxLayout()
+        lv_t.setSpacing(2)
+        lv_t.addWidget(label("Your levers", "H2"))
+        lv_t.addWidget(label("Room rates are set against the market for each segment", "Muted", wrap=True))
+        lh.addLayout(lv_t, 1)
         reset = QPushButton("Reset")
         reset.setObjectName("Ghost")
         reset.setCursor(Qt.PointingHandCursor)
@@ -187,7 +183,7 @@ class SeasonPage(QWidget):
         lh.addWidget(reset)
         ll.addLayout(lh)
         self.rate_rows: dict[str, LeverRow] = {}
-        for seg in S.RATE_SEGMENTS:
+        for seg in SEGMENTS:
             r = LeverRow(SEGMENT_LABELS.get(seg, seg), self.levers.rate_position.get(seg, 0.0), self._changed)
             self.rate_rows[seg] = r
             ll.addWidget(r)
@@ -205,16 +201,17 @@ class SeasonPage(QWidget):
         for key, text in STAFFING:
             b = QPushButton(text)
             b.setObjectName("Segment")
+            b.setMinimumWidth(96)
             b.setCheckable(True)
             b.setCursor(Qt.PointingHandCursor)
             b.setProperty("key", key)
             self.staff_group.addButton(b)
             sb.addWidget(b)
         self.staff_group.buttonClicked.connect(lambda _b: self._changed())
-        g.addWidget(seg_box, 1, 0)
+        g.addWidget(seg_box, 1, 0, Qt.AlignLeft)
         self.staff_note = label("", "Muted", wrap=True)
         g.addWidget(self.staff_note, 2, 0)
-        g.addWidget(label("Marketing this month", "H3"), 0, 1)
+        g.addWidget(label("Marketing this month", "H3"), 3, 0)
         mk = QHBoxLayout()
         self.mkt = QSlider(Qt.Horizontal)
         self.mkt.setRange(0, 40)  # × SAR 10k
@@ -225,11 +222,10 @@ class SeasonPage(QWidget):
         self.mkt_out.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         mk.addWidget(self.mkt, 1)
         mk.addWidget(self.mkt_out)
-        g.addLayout(mk, 1, 1)
-        g.addWidget(label("Spend lifts direct bookings, mostly next month.", "Muted", wrap=True), 2, 1)
+        g.addLayout(mk, 4, 0)
+        g.addWidget(label("Spend lifts direct bookings, mostly next month.", "Muted", wrap=True), 5, 0)
         self.mkt.valueChanged.connect(lambda v: (self.mkt_out.setText(f"SAR {v * 10:,}k"), self._changed()))
-        g.setColumnStretch(0, 1)
-        g.setColumnStretch(1, 1)
+        g.setRowMinimumHeight(3, 34)
         ll.addLayout(g)
         ll.addStretch(1)
         coach = QFrame()
@@ -247,22 +243,23 @@ class SeasonPage(QWidget):
 
         # projection
         pw = QWidget()
-        pw.setFixedWidth(340)
+        pw.setFixedWidth(310)
         pr = QVBoxLayout(pw)
         pr.setContentsMargins(0, 0, 0, 0)
         pr.setSpacing(14)
         pc, pl = card(margins=20, spacing=12)
         pl.addWidget(label("Projected month", "H2"))
         pl.addWidget(label("EBITDA range across likely demand outcomes", "Muted", wrap=True))
+        self.p_likely = label("")
+        pl.addWidget(self.p_likely)
+        self.p_gap = label("")
+        pl.addWidget(self.p_gap)
         self.range = RangeBar()
         pl.addWidget(self.range)
         rr = QHBoxLayout()
         self.p_low = label("", "Muted")
-        self.p_likely = label("")
         self.p_high = label("", "Muted")
         rr.addWidget(self.p_low)
-        rr.addStretch(1)
-        rr.addWidget(self.p_likely)
         rr.addStretch(1)
         rr.addWidget(self.p_high)
         pl.addLayout(rr)
@@ -348,11 +345,15 @@ class SeasonPage(QWidget):
             self.coach.setText(f"Projection unavailable: {exc}")
             return
         self.range.set(pj.low, pj.likely, pj.high, pj.budget_ebitda)
-        self.p_low.setText(short_money(pj.low))
-        self.p_high.setText(short_money(pj.high))
+        self.p_low.setText(f"Low {short_money(pj.low)}")
+        self.p_high.setText(f"High {short_money(pj.high)}")
         p = theme.current()
+        gap = pj.likely - pj.budget_ebitda
         self.p_likely.setText(f"{short_money(pj.likely)} likely")
-        self.p_likely.setStyleSheet(f"color: {p.teal}; font-weight: 800; font-size: 15px;")
+        self.p_likely.setStyleSheet(f"color: {p.teal}; font-weight: 800; font-size: 22px;")
+        self.p_gap.setText(f"{'+' if gap >= 0 else '−'}{short_money(abs(gap))} against budget of "
+                           f"{short_money(pj.budget_ebitda)}")
+        self.p_gap.setStyleSheet(f"color: {p.good if gap >= 0 else p.bad}; font-weight: 600;")
         k = pj.kpis
         self.p_vals["occupancy"].setText(f"{k['occupancy'] * 100:.1f}%")
         self.p_vals["adr"].setText(f"SAR {k['adr']:,.0f}")
@@ -387,7 +388,7 @@ class SeasonPage(QWidget):
     # ---- results view ----------------------------------------------------------------------
     def _build_results(self):
         v = QVBoxLayout(self.results)
-        v.setContentsMargins(32, 22, 32, 28)
+        v.setContentsMargins(28, 22, 28, 28)
         v.setSpacing(20)
         head = QHBoxLayout()
         head.addWidget(label("MONTH CLOSE", "Overline"), 0, Qt.AlignBottom)
@@ -408,8 +409,8 @@ class SeasonPage(QWidget):
         left.setSpacing(20)
         self.r_hero = Hero("good")
         hh = QHBoxLayout(self.r_hero)
-        hh.setContentsMargins(30, 26, 30, 26)
-        hh.setSpacing(36)
+        hh.setContentsMargins(26, 24, 26, 24)
+        hh.setSpacing(24)
         hv = QVBoxLayout()
         hv.setSpacing(6)
         self.r_verdict = label("", "ChipGood")
@@ -423,7 +424,7 @@ class SeasonPage(QWidget):
         hh.addLayout(hv)
         hh.addStretch(1)
         self.r_stats = QGridLayout()
-        self.r_stats.setHorizontalSpacing(30)
+        self.r_stats.setHorizontalSpacing(22)
         hh.addLayout(self.r_stats)
         left.addWidget(self.r_hero)
         bc, bl = card(margins=22, spacing=12)
@@ -451,7 +452,7 @@ class SeasonPage(QWidget):
         cols.addLayout(left, 1)
 
         right_w = QWidget()
-        right_w.setFixedWidth(380)
+        right_w.setFixedWidth(330)
         right = QVBoxLayout(right_w)
         right.setContentsMargins(0, 0, 0, 0)
         right.setSpacing(16)
@@ -485,7 +486,7 @@ class SeasonPage(QWidget):
         p = theme.current()
         m = r["month"]
         self.r_title.setText(r.get("label") or f"{MONTHS[m - 1]} 2027")
-        if self.season.month > 12 or getattr(self.season, "over", False):
+        if self.season.finished:
             self.next_btn.setText("See the season review")
         else:
             self.next_btn.setText(f"Go to {MONTHS[self.season.month - 1]}")
@@ -570,7 +571,7 @@ class SeasonPage(QWidget):
         self.views.setCurrentIndex(1)
 
     def _next(self):
-        if self.season.month > 12 or getattr(self.season, "over", False):
+        if self.season.finished:
             self._show_review()
         else:
             self.refresh()
@@ -596,6 +597,15 @@ class SeasonPage(QWidget):
         self.rv_grade.setFixedSize(132, 132)
         hl.addWidget(self.rv_grade)
         v.addWidget(self.rv_hero)
+        self.rv_stats = QGridLayout()
+        self.rv_stats.setSpacing(16)
+        v.addLayout(self.rv_stats)
+        bc, bl = card(margins=22, spacing=12)
+        bl.addWidget(label("Month by month", "H2"))
+        from ..visuals import SeasonBars
+        self.rv_bars = SeasonBars(200)
+        bl.addWidget(self.rv_bars)
+        v.addWidget(bc)
         sc, self.rv_lines = card(margins=24, spacing=10)
         v.addWidget(sc)
         row = QHBoxLayout()
@@ -611,11 +621,29 @@ class SeasonPage(QWidget):
     def _show_review(self):
         p = theme.current()
         rv = S.final_review(self.season)
-        self.rv_title.setText(rv.get("headline") or f"{rv.get('title', '')}")
+        self.rv_title.setText(f"{rv['title']} · FY2027 closed")
         self.rv_sub.setText(" ".join(rv.get("summary", [])[:1]))
         self.rv_grade.setText(rv.get("grade", "—"))
         self.rv_grade.setStyleSheet(f"background: {p.teal}; color: {p.on_accent}; border-radius: 30px; "
                                     f"font-family: '{theme.DISPLAY_FONT}'; font-size: 68px;")
+        _clear(self.rv_stats)
+        stats = [("Season EBITDA", short_money(rv["ebitda"]), f"{rv['variance_pct'] * 100:+.1f}% vs budget",
+                  rv["variance_pct"] >= 0),
+                 ("Best month", rv.get("best_month") or "—", "Largest beat against budget", True),
+                 ("Toughest month", rv.get("worst_month") or "—", "Largest miss against budget", False),
+                 ("Objectives met", str(rv.get("objectives_met", 0)), "Across four quarters", None),
+                 ("Owner confidence", str(rv.get("confidence", "—")), f"Guest score {rv.get('guest_score', 0):.1f}",
+                  None)]
+        for i, (t, val, sub, good) in enumerate(stats):
+            f, fl = card(margins=18, spacing=4)
+            fl.addWidget(label(t, "KPILabel"))
+            vl = label(val)
+            vl.setStyleSheet("font-size: 22px; font-weight: 600;")
+            fl.addWidget(vl)
+            fl.addWidget(label(sub, "Muted" if good is None else ("Good" if good else "Bad")))
+            self.rv_stats.addWidget(f, 0, i)
+        ser = S.season_series(self.season)
+        self.rv_bars.set(ser["labels"], ser["actual"], ser["budget"], None)
         _clear(self.rv_lines)
         self.rv_lines.addWidget(label("How the year went", "H2"))
         for line in rv.get("summary", []):
@@ -638,13 +666,13 @@ class SeasonPage(QWidget):
 
     # ---- page protocol ---------------------------------------------------------------------
     def focus_item(self, payload):
-        if payload == "review" and self.season.month > 12:
+        if payload == "review" and self.season.finished:
             self._show_review()
 
     def refresh(self) -> None:
         self.season = S.load(self.state.db) or self.season
         sn = self.season
-        if sn.month > 12 or getattr(sn, "over", False):
+        if sn.finished:
             if self.views.currentIndex() != 1:
                 self._show_review()
             return

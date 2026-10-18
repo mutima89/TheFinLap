@@ -8,7 +8,7 @@ from ...game import season as S
 from .. import icons, theme
 from ..chrome import MONTHS
 from ..visuals import Avatar, Hero, ProgressLine, SeasonBars, short_money
-from ..widgets import KPICard, Page, card, label
+from ..widgets import KPICard, Page, card, clear_layout, label
 
 
 def next_topic(db):
@@ -72,15 +72,17 @@ class CommandCenterPage(Page):
         # KPI cards
         g = QGridLayout()
         g.setSpacing(16)
-        self.k_ebitda = KPICard("ebitda", "EBITDA, season to date", "Earnings before interest, tax, depreciation and "
+        self.k_ebitda = KPICard("ebitda", "EBITDA to date", "Earnings before interest, tax, depreciation and "
                                 "amortisation for the months you have played, against the same months' budget.")
-        self.k_revpar = KPICard("revpar", "RevPAR, season to date", "Room revenue per available room.")
-        self.k_occ = KPICard("occupancy", "Occupancy, season to date", "Occupied rooms ÷ available rooms.")
-        self.k_cash = KPICard("cash", "Cash against the covenant floor",
+        self.k_revpar = KPICard("revpar", "RevPAR to date", "Room revenue per available room.")
+        self.k_occ = KPICard("occupancy", "Occupancy to date", "Occupied rooms ÷ available rooms.")
+        self.k_cash = KPICard("cash", "Cash vs lenders' floor",
                               "The lenders require cash to stay above the floor. Breaching it ends the season.")
         self.cash_bar = ProgressLine(8)
         self.k_cash.layout().addWidget(self.cash_bar)
         for i, k in enumerate((self.k_ebitda, self.k_revpar, self.k_occ, self.k_cash)):
+            k.value.setStyleSheet("font-size: 22px;")
+            k.setMinimumWidth(0)
             k.clicked.connect(lambda _k: self.state.navigate.emit("season", None))
             g.addWidget(k, 0, i)
         left.addLayout(g)
@@ -98,9 +100,10 @@ class CommandCenterPage(Page):
         leg = QHBoxLayout()
         leg.setSpacing(18)
         p = theme.current()
-        for col, text in ((p.good, "Beat budget"), (p.bad, "Missed budget"), (p.surface3, "Budget, still to play")):
+        self._dots = []
+        for key, text in (("good", "Beat budget"), ("bad", "Missed budget"), ("surface3", "Budget, still to play")):
             dot = label("■")
-            dot.setStyleSheet(f"color: {col}; font-size: 15px;")
+            self._dots.append((dot, key))
             leg.addWidget(dot)
             leg.addWidget(label(text, "Muted"))
             leg.addSpacing(6)
@@ -156,7 +159,7 @@ class CommandCenterPage(Page):
 
     def _hero_clicked(self):
         sn = self._season()
-        if sn.month > 12:
+        if sn.finished:
             self.state.navigate.emit("season", "review")
         else:
             self.state.navigate.emit("season", None)
@@ -171,7 +174,7 @@ class CommandCenterPage(Page):
         db = self.state.db
         hist = sn.history
         # hero
-        if sn.month > 12:
+        if sn.finished:
             rv = S.final_review(sn)
             self.hero_eyebrow.setText("SEASON COMPLETE")
             self.hero_title.setText(f"FY2027 closed · grade {rv['grade']}")
@@ -209,35 +212,28 @@ class CommandCenterPage(Page):
             cash = act[-1].get("closing_cash")
         else:
             b1 = ser["budget"][0]
-            self.k_ebitda.set(short_money(sum(ser["budget"])), "Full-year budget · nothing played yet")
-            self.k_revpar.set("—", "Appears after your first month")
-            self.k_occ.set("—", "Appears after your first month")
+            self.k_ebitda.set(short_money(sum(ser["budget"])), "Full-year budget")
+            self.k_revpar.set("—", "After your first month")
+            self.k_occ.set("—", "After your first month")
             cash = None
             _ = b1
         floor = S.CASH_FLOOR
-        if cash is None:
-            cash = getattr(sn, "cash", None)
+        cash = sn.cash
         if cash is not None:
-            self.k_cash.set(short_money(cash), f"{short_money(cash - floor)} headroom over the floor", cash >= floor)
+            self.k_cash.set(short_money(cash), f"{short_money(cash - floor)} headroom", cash >= floor)
             self.cash_bar.set(min(1.0, cash / (floor * 1.6)), "blue", marker=floor / (floor * 1.6))
         else:
             self.k_cash.set("—", f"Floor: {short_money(floor)}")
             self.cash_bar.set(0.0, "blue")
 
+        for dot, key in self._dots:
+            dot.setStyleSheet(f"color: {getattr(p, key)}; font-size: 15px;")
         # season bars
-        cur = None if sn.month > 12 else sn.month - 1
+        cur = None if sn.finished else sn.month - 1
         self.bars.set([lab[:3] for lab in ser["labels"]], ser["actual"], ser["budget"], cur)
 
         # objectives
-        while self.obj_box.count():
-            it = self.obj_box.takeAt(0)
-            if it.layout():
-                while it.layout().count():
-                    w = it.layout().takeAt(0).widget()
-                    if w:
-                        w.deleteLater()
-            elif it.widget():
-                it.widget().deleteLater()
+        clear_layout(self.obj_box)
         q = (min(sn.month, 12) - 1) // 3 + 1
         self.obj_title.setText(f"Q{q} objectives")
         tone = {"met": "good", "on_track": "good", "at_risk": "gold", "missed": "bad"}

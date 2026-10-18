@@ -18,13 +18,11 @@ def season_snapshot(db) -> dict:
     hist = sn.history
     states = [h.get("verdict", "on") for h in hist]
     month = min(sn.month, 12)
-    if sn.month <= 12:
+    if not sn.finished:
         states.append("current")
-    cash = None
-    if hist:
-        cash = hist[-1].get("actual", {}).get("closing_cash")
+    cash = sn.cash
     title, nxt, lo, hi = S.title_for(sn.xp)
-    return {"states": states, "month": month, "finished": sn.month > 12, "confidence": sn.confidence,
+    return {"states": states, "month": month, "finished": sn.finished, "confidence": sn.confidence,
             "guest": sn.guest_score, "cash": cash, "xp": sn.xp, "title": title, "next_title": nxt,
             "xp_floor": lo, "xp_next": hi}
 
@@ -33,8 +31,8 @@ class _Stat(QWidget):
     def __init__(self, caption: str):
         super().__init__()
         v = QVBoxLayout(self)
-        v.setContentsMargins(0, 0, 0, 0)
-        v.setSpacing(0)
+        v.setContentsMargins(0, 12, 0, 12)
+        v.setSpacing(1)
         self.cap = label(caption, "TopStatLabel")
         self.val = label("—", "TopStatValue")
         self.cap.setAlignment(Qt.AlignRight)
@@ -63,7 +61,7 @@ class SeasonStrip(QWidget):
         conf = QHBoxLayout()
         conf.setSpacing(8)
         self.ring = Ring(34, 3.5)
-        self.conf = _Stat("Owner confidence")
+        self.conf = _Stat("Confidence")
         self.conf.cap.setAlignment(Qt.AlignLeft)
         self.conf.val.setAlignment(Qt.AlignLeft)
         conf.addWidget(self.ring)
@@ -80,7 +78,7 @@ class SeasonStrip(QWidget):
         self.setVisible(True)
         self.track.set(s["states"])
         self.month_lbl.setText("Season complete" if s["finished"]
-                               else f"Month {s['month']} of 12 · {MONTHS[s['month'] - 1]}")
+                               else f"{MONTHS[s['month'] - 1]} · month {s['month']} of 12")
         self.cash.val.setText(short_money(s["cash"]) if s["cash"] is not None else "SAR —")
         self.guest.val.setText(f"{s['guest']:.1f} / 5")
         self.conf.val.setText(f"{s['confidence']:.0f}")

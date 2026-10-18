@@ -343,6 +343,18 @@ def error(parent: QWidget, title: str, text: str) -> None:
     QMessageBox.warning(parent, title, text)
 
 
+def clear_layout(lay) -> None:
+    """Remove and delete everything in a layout, hiding widgets at once so nothing stale paints."""
+    while lay.count():
+        it = lay.takeAt(0)
+        w = it.widget()
+        if w is not None:
+            w.hide()
+            w.deleteLater()
+        elif it.layout() is not None:
+            clear_layout(it.layout())
+
+
 def grid(widgets: list[QWidget], columns: int) -> QGridLayout:
     g = QGridLayout()
     g.setSpacing(10)

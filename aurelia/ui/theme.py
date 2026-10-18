@@ -133,7 +133,7 @@ QListWidget#Nav::item {{ padding: 6px 10px; border-radius: 9px; color: {p.text2}
 QListWidget#Nav::item:hover {{ background: {p.surface2}; color: {p.text}; }}
 QListWidget#Nav::item:selected {{ background: {p.surface3}; color: {p.text}; font-weight: 600;
     border-left: 2px solid {p.teal}; }}
-QListWidget#Nav::item:disabled {{ color: {p.muted}; font-size: {fs - 3}px; font-weight: 700; padding: 10px 10px 2px 10px;
+QListWidget#Nav::item:disabled {{ color: {p.muted}; font-size: {fs - 3}px; font-weight: 700; padding: 8px 10px 0px 10px;
     letter-spacing: 1.6px; background: transparent; }}
 QFrame#RankCard {{ background: {p.surface}; border: 1px solid {p.border}; border-radius: 12px; }}
 
@@ -200,7 +200,7 @@ QPushButton#Choice {{ background: transparent; border: 1px solid {p.border}; bor
     color: {p.text2}; font-weight: 600; }}
 QPushButton#Choice:hover {{ border-color: {p.teal}; color: {p.text}; }}
 QPushButton#Choice:checked {{ background: {p.accent_soft}; border: 1.5px solid {p.teal}; color: {p.teal}; font-weight: 800; }}
-QPushButton#Segment {{ background: transparent; border: none; border-radius: 8px; padding: 8px 0; color: {p.muted}; }}
+QPushButton#Segment {{ background: transparent; border: none; border-radius: 8px; padding: 8px 10px; color: {p.muted}; }}
 QPushButton#Segment:checked {{ background: {p.surface3}; color: {p.text}; font-weight: 800; border: none; }}
 QFrame#SegmentBox {{ background: {p.bg}; border: 1px solid {p.border}; border-radius: 11px; }}
 QToolButton {{ background: transparent; border: none; border-radius: 8px; padding: 6px; }}

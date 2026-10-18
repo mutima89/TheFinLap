@@ -27,11 +27,11 @@ def _tone(p: theme.Palette, tone: str | None) -> str:
             "muted": p.muted}.get(tone or "gold", p.teal)
 
 
-def short_money(v: float, prefix: str = "SAR ") -> str:
+def short_money(v: float, prefix: str = "SAR ", digits: int = 2) -> str:
     a = abs(v)
     sign = "−" if v < 0 else ""
     if a >= 1e6:
-        return f"{sign}{prefix}{a / 1e6:,.2f}m"
+        return f"{sign}{prefix}{a / 1e6:,.{digits}f}m"
     if a >= 1e3:
         return f"{sign}{prefix}{a / 1e3:,.0f}k"
     return f"{sign}{prefix}{a:,.0f}"
@@ -215,7 +215,7 @@ class MonthTrack(QWidget):
     def __init__(self):
         super().__init__()
         self.states: list[str] = ["future"] * 12
-        self.setFixedSize(12 * 24 + 14, 8)
+        self.setFixedSize(26 + 11 * 14 + 11 * 4, 8)
 
     def set(self, states: Sequence[str]) -> None:
         self.states = list(states)[:12] + ["future"] * max(0, 12 - len(states))
@@ -228,7 +228,7 @@ class MonthTrack(QWidget):
         qp.setPen(Qt.NoPen)
         x = 0.0
         for s in self.states:
-            w = 34.0 if s == "current" else 20.0
+            w = 26.0 if s == "current" else 14.0
             col = {"beat": p.good, "on": p.blue, "missed": p.bad, "current": p.teal}.get(s, p.surface3)
             qp.setBrush(_c(col))
             qp.drawRoundedRect(QRectF(x, 1, w, 6), 3, 3)
@@ -236,7 +236,7 @@ class MonthTrack(QWidget):
         qp.end()
 
     def sizeHint(self):  # noqa: N802
-        return QSize(int(11 * 24 + 38), 8)
+        return QSize(26 + 11 * 14 + 11 * 4, 8)
 
 
 class SeasonBars(QWidget):
@@ -355,7 +355,7 @@ class BridgeChart(QWidget):
         bots = [0.0] + [min(levels[i], levels[i + 1]) for i in range(len(self.steps))] + [0.0]
         hi = max(tops) * 1.08 or 1.0
         lo = min(0.0, min(bots))
-        lab_h = 36
+        lab_h = 46
         val_h = 20
         top = val_h
         h = self.height() - lab_h - top
