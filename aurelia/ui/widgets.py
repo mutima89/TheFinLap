@@ -33,7 +33,7 @@ def label(text: str = "", obj: str | None = None, wrap: bool = False) -> QLabel:
     return lab
 
 
-def card(layout_cls=QVBoxLayout, margins: int = 14, spacing: int = 8) -> tuple[QFrame, QVBoxLayout]:
+def card(layout_cls=QVBoxLayout, margins: int = 20, spacing: int = 10) -> tuple[QFrame, QVBoxLayout]:
     f = QFrame()
     f.setObjectName("Card")
     lay = layout_cls(f)
@@ -60,21 +60,24 @@ def button(text: str, slot: Callable | None = None, primary: bool = False, dange
 class Page(QScrollArea):
     """A scrollable page with a title, subtitle and vertical content layout."""
 
-    def __init__(self, title: str, subtitle: str = ""):
+    def __init__(self, title: str, subtitle: str = "", eyebrow: str = ""):
         super().__init__()
         self.setWidgetResizable(True)
         self.setFrameShape(QFrame.NoFrame)
         inner = QWidget()
         inner.setObjectName("Page")
         self.body = QVBoxLayout(inner)
-        self.body.setContentsMargins(24, 18, 24, 24)
-        self.body.setSpacing(14)
+        self.body.setContentsMargins(36, 26, 36, 32)
+        self.body.setSpacing(18)
         head = QVBoxLayout()
-        head.setSpacing(2)
+        head.setSpacing(6)
+        if eyebrow:
+            head.addWidget(label(eyebrow.upper(), "Eyebrow"))
         self.title_label = label(title, "H1")
         head.addWidget(self.title_label)
         if subtitle:
-            self.subtitle_label = label(subtitle, "Muted", wrap=True)
+            self.subtitle_label = label(subtitle, "Body", wrap=True)
+            self.subtitle_label.setMaximumWidth(980)
             head.addWidget(self.subtitle_label)
         self.body.addLayout(head)
         self.setWidget(inner)
@@ -93,20 +96,28 @@ class KPICard(QFrame):
         self.setCursor(Qt.PointingHandCursor)
         self.setToolTip(tooltip + "\n\nClick to open the source analysis.")
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(14, 10, 14, 10)
-        lay.setSpacing(2)
+        lay.setContentsMargins(18, 16, 18, 14)
+        lay.setSpacing(4)
         self.title = label(title, "KPILabel")
         self.value = label("—", "KPIValue")
         self.delta = label("", "Muted")
         lay.addWidget(self.title)
         lay.addWidget(self.value)
         lay.addWidget(self.delta)
+        from .visuals import Sparkline
+        self.spark = Sparkline()
+        self.spark.setVisible(False)
+        lay.addWidget(self.spark)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setMinimumWidth(150)
 
-    def set(self, value: str, delta: str = "", good: bool | None = None) -> None:
+    def set(self, value: str, delta: str = "", good: bool | None = None, spark: list[float] | None = None,
+            spark_ref: list[float] | None = None) -> None:
         self.value.setText(value)
         self.delta.setText(delta)
+        if spark is not None and len(spark) > 1:
+            self.spark.set(spark, spark_ref, None if good is None else ("good" if good else "bad"))
+            self.spark.setVisible(True)
         self.delta.setObjectName("Muted" if good is None else ("Good" if good else "Bad"))
         self.delta.style().unpolish(self.delta)
         self.delta.style().polish(self.delta)
@@ -121,7 +132,7 @@ class Banner(QFrame):
         super().__init__()
         self.setObjectName("Banner")
         lay = QHBoxLayout(self)
-        lay.setContentsMargins(12, 8, 12, 8)
+        lay.setContentsMargins(14, 10, 14, 10)
         self.text = label(text, wrap=True)
         lay.addWidget(self.text)
 
@@ -174,16 +185,16 @@ class Chart(QWidget):
     def style_axes(ax) -> None:
         p = theme.current()
         ax.set_facecolor(p.surface)
-        for side in ("top", "right"):
+        for side in ("top", "right", "left"):
             ax.spines[side].set_visible(False)
-        for side in ("left", "bottom"):
-            ax.spines[side].set_color(p.border)
-        ax.tick_params(colors=p.muted, labelsize=8)
-        ax.grid(True, color=p.grid, linewidth=0.6)
+        ax.spines["bottom"].set_color(p.border)
+        ax.tick_params(colors=p.muted, labelsize=8.5, length=0, pad=6)
+        ax.grid(True, axis="y", color=p.grid, linewidth=0.8)
+        ax.grid(False, axis="x")
         ax.set_axisbelow(True)
         ax.title.set_color(p.text)
-        ax.title.set_fontsize(10)
-        ax.title.set_fontweight("bold")
+        ax.title.set_fontsize(10.5)
+        ax.title.set_fontweight("semibold")
         ax.xaxis.label.set_color(p.text2)
         ax.yaxis.label.set_color(p.text2)
 
@@ -242,8 +253,8 @@ class DataFrameModel(QAbstractTableModel):
                 return int(Qt.AlignRight | Qt.AlignVCenter)
             return int(Qt.AlignLeft | Qt.AlignVCenter)
         if role == Qt.FontRole and index.row() in self.bold_rows:
-            f = QFont()
-            f.setBold(True)
+            f = QFont(theme.UI_FONT)
+            f.setWeight(QFont.Bold)
             return f
         if role == Qt.ForegroundRole and col in self.nature:
             verdict = self.nature[col](index.row(), val)
@@ -255,6 +266,14 @@ class DataFrameModel(QAbstractTableModel):
         return None
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):  # noqa: N802
+        if role == Qt.TextAlignmentRole and orientation == Qt.Horizontal:
+            if section > 0 and len(self.df):
+                v = self.df.iat[0, section]
+                numeric = (isinstance(v, (int, float, np.number)) and not isinstance(v, bool)) or \
+                    (isinstance(v, str) and bool(_NUMERIC_TEXT.match(v)))
+                if numeric:
+                    return int(Qt.AlignRight | Qt.AlignVCenter)
+            return int(Qt.AlignLeft | Qt.AlignVCenter)
         if role != Qt.DisplayRole:
             return None
         if orientation == Qt.Horizontal:
@@ -271,7 +290,10 @@ class Table(QTableView):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.verticalHeader().setVisible(False)
-        self.verticalHeader().setDefaultSectionSize(26)
+        self.verticalHeader().setDefaultSectionSize(34)
+        self.setShowGrid(False)
+        self.setFrameShape(QFrame.NoFrame)
+        self.horizontalHeader().setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.horizontalHeader().setHighlightSections(False)
         self.stretch_first = stretch_first
         self.setMinimumHeight(min_height)
@@ -291,7 +313,7 @@ class Table(QTableView):
 
     def fit_height(self, max_rows: int = 30) -> None:
         rows = min(self.model_.rowCount(), max_rows)
-        h = 30 + rows * 26 + 22  # header + rows + room for a horizontal scrollbar
+        h = 38 + rows * 34 + 22  # header + rows + room for a horizontal scrollbar
         self.setMinimumHeight(h)
         self.setMaximumHeight(h if self.model_.rowCount() <= max_rows else 16777215)
 
