@@ -307,8 +307,12 @@ class Table(QTableView):
                         formatters, bold_rows)
         hh = self.horizontalHeader()
         hh.setSectionResizeMode(QHeaderView.ResizeToContents)
-        hh.setStretchLastSection(not self.stretch_first)
-        if self.stretch_first and len(df.columns):
+        # Stretching a numeric last column pushes its figures to the far edge, away from the rest of the row,
+        # so spare width goes to a text column instead.
+        last_is_text = len(df.columns) > 0 and not pd.api.types.is_numeric_dtype(df.iloc[:, -1])
+        stretch_first = self.stretch_first or not last_is_text
+        hh.setStretchLastSection(not stretch_first)
+        if stretch_first and len(df.columns):
             hh.setSectionResizeMode(0, QHeaderView.Stretch)
 
     def fit_height(self, max_rows: int = 30) -> None:

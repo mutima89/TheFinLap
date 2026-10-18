@@ -38,6 +38,8 @@ class RevenuePage(Page):
                            ("ota_share", "OTA share")):
             c = KPICard(key, title, KPI_DEFINITIONS[key].formula)
             c.clicked.connect(lambda k: self.tabs.setCurrentIndex(self.tabs.count() - 1))
+            c.setMinimumWidth(0)
+            c.value.setStyleSheet("font-size: 21px;")
             self.cards[key] = c
             row.addWidget(c)
         self.body.addLayout(row)

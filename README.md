@@ -7,8 +7,9 @@
 **Learn hotel commercial finance by running one.**
 
 An offline Windows desktop simulator where you take the finance seat at *The Aurelia Grand*, a fictional
-150-room luxury hotel, and practise revenue management, FP&A, forecasting, three-statement modelling,
-investment appraisal, Excel and executive decision-making on a live, fully integrated model.
+150-room luxury hotel. Play a full financial year one month at a time, then go deep on revenue management, FP&A,
+forecasting, three-statement modelling, investment appraisal, Excel and executive decisions on the same live,
+fully integrated model.
 
 [![Release](https://img.shields.io/github/v/release/mutima89/TheFinLap?label=download&color=2ec4b6)](https://github.com/mutima89/TheFinLap/releases/latest)
 [![Windows build](https://github.com/mutima89/TheFinLap/actions/workflows/release.yml/badge.svg)](https://github.com/mutima89/TheFinLap/actions/workflows/release.yml)
@@ -17,10 +18,10 @@ investment appraisal, Excel and executive decision-making on a live, fully integ
 ![PySide6](https://img.shields.io/badge/UI-PySide6%20%2F%20Qt%206-41cd52)
 ![Offline](https://img.shields.io/badge/data-stays%20on%20your%20PC-1f2a44)
 
-[**Download for Windows**](#-download-and-run) · [Screenshots](#-a-tour) · [Features](#-what-you-can-do) ·
+[**Download for Windows**](#-download-and-run) · [Play a season](#-play-a-season) · [Screenshots](#-a-tour) · [Features](#-what-you-can-do) ·
 [Build from source](#-run-or-build-from-source) · [Docs](#-documentation)
 
-<img src="docs/images/dashboard.png" alt="Aurelia Finance Lab dashboard" width="900">
+<img src="docs/images/command_center.png" alt="Aurelia Finance Lab Command Center" width="900">
 
 </div>
 
@@ -31,10 +32,13 @@ investment appraisal, Excel and executive decision-making on a live, fully integ
 
 ## ✨ Why it is different
 
+* **A season you actually play.** Twelve monthly turns as the hotel's finance lead. Each month brings a market
+  briefing and decisions, you set rates, staffing and marketing, see a projected range, commit, and get a month
+  close with an exact EBITDA bridge, the owner's reaction, objectives, XP and a career title ladder.
 * **One engine, everything connected.** A calculation graph of 13 nodes and 97 line items links daily rooms
   demand to departmental profit, EBITDA, the balance sheet and cash over 36 months. Change a room rate and you
   see the effect flow through to closing cash. Fourteen integrity checks run on every recalculation.
-* **Judgement, not just arithmetic.** The Executive Decision Room gives you nine realistic management situations,
+* **Judgement, not just arithmetic.** Boardroom Cases (the Executive Decision Room) give you nine realistic management situations,
   asks you to quantify the options and defend a recommendation, and grades reasoning, evidence and risk as well
   as the answer.
 * **Honest analysis.** Variance explanations separate what the data measures from causes you still need to
@@ -64,13 +68,38 @@ and the build and self-test reports.
 Requirements: Windows 10 or 11, 64-bit. To check an installation at any time, run
 `Aurelia_Finance_Lab.exe --selftest` (see [command-line options](#command-line-options)).
 
+## 🎮 Play a season
+
+<img src="docs/images/run_the_month.png" alt="Run the Month" width="900">
+
+Each turn is one month of FY2027 at The Aurelia Grand.
+
+1. **Read the briefing.** One market card and one or two decisions or issues from sales, engineering, e-commerce
+   or guest relations: a corporate account asking for a discount, an OTA promotion slot, a lift that needs
+   replacing. Some choices carry risk into later months.
+2. **Pull the levers.** Price each of the five segments against the market (−20% to +20%), choose lean,
+   standard or premium staffing, and set the month's marketing spend.
+3. **Check the projection.** A low / likely / high EBITDA range against the month's budget updates as you move
+   the levers, with the occupancy, ADR, RevPAR, cash and guest score behind it.
+4. **Close the month.** The full engine runs the month with real demand variation. You get the result against
+   budget, a budget-to-actual bridge that adds up exactly, what the model measured versus what is still unexplained,
+   the asset manager's reaction, and anything carried into next month.
+
+Keep cash above the lenders' floor of SAR 20m, protect the guest score and owner confidence, hit the quarterly
+objectives, and climb from Finance Trainee to Area CFO. After December you get a graded season review.
+
+| | |
+|---|---|
+| <img src="docs/images/month_close.png" alt="Month close"><br>**Month close.** Verdict, EBITDA bridge from budget to actual, measured vs unexplained, owner reaction and XP. | <img src="docs/images/season_review.png" alt="Season review"><br>**Season review.** Grade, best and toughest month, objectives met and the year month by month. |
+| <img src="docs/images/command_center_light.png" alt="Command Center, light theme"><br>**Command Center.** Your next turn, the season so far, quarterly objectives, the owner's view and what to learn next. | <img src="docs/images/dashboard.png" alt="Hotel Dashboard"><br>**Hotel Dashboard.** The full three-year model behind the game, live from the working scenario. |
+
 ## 🧭 A tour
 
 | | |
 |---|---|
 | <img src="docs/images/scenario_lab.png" alt="Scenario Lab"><br>**Scenario Lab.** 91 validated drivers, compare against any scenario, EBITDA bridge, undo/redo and an auto-saved draft. | <img src="docs/images/revenue_management.png" alt="Revenue Management"><br>**Revenue Management.** Segment and channel economics, pace, displacement, MLOS, overbooking and forecast accuracy. |
 | <img src="docs/images/fpa.png" alt="FP&A and variances"><br>**FP&A and Variances.** Budget vs actual vs latest estimate, price/volume/mix, flexible budget and evidence-backed explanations. | <img src="docs/images/statements.png" alt="Financial statements"><br>**Financial Statements.** USALI operating statement, income statement, balance sheet, cash flow and integrity checks. |
-| <img src="docs/images/sensitivity_risk.png" alt="Sensitivity and risk"><br>**Sensitivity and Risk.** One- and two-way sensitivity, tornado, break-even and Monte Carlo with a visible seed. | <img src="docs/images/decisions.png" alt="Executive Decision Room"><br>**Executive Decision Room.** Quantify the alternatives, decide, justify and see the outcome. |
+| <img src="docs/images/sensitivity_risk.png" alt="Sensitivity and risk"><br>**Sensitivity and Risk.** One- and two-way sensitivity, tornado, break-even and Monte Carlo with a visible seed. | <img src="docs/images/decisions.png" alt="Executive Decision Room"><br>**Boardroom Cases.** Quantify the alternatives, decide, justify and see the outcome. |
 | <img src="docs/images/learning_path.png" alt="Learning Path"><br>**Learning Path.** Nine stages and 26 topics that unlock as you demonstrate competency. | <img src="docs/images/excel_lab.png" alt="Excel Lab"><br>**Excel Lab.** Generate practice workbooks and have a copy of your finished file graded. |
 | <img src="docs/images/capstone.png" alt="Capstone"><br>**Capstone.** Clean a messy dataset and defend your analysis across ten scored steps. | <img src="docs/images/dashboard_light.png" alt="Light theme"><br>**Light and dark themes**, SAR or USD display, global search (Ctrl+K). |
 
@@ -78,7 +107,9 @@ Requirements: Windows 10 or 11, 64-bit. To check an installation at any time, ru
 
 | Area | Highlights |
 |---|---|
-| Dashboard | Current position, budget and forecast status, next learning objective, open decisions, competencies |
+| Command Center | Next turn, season KPIs with sparklines, cash against the lenders' floor, quarterly objectives, owner's view |
+| Run the Month | Twelve-month season: briefing cards, rate/staffing/marketing levers, projected range, month close, season review |
+| Hotel Dashboard | Current position, budget and forecast status, next learning objective, open decisions, competencies |
 | Scenario Lab | 91 drivers, Base/Upside/Downside reference cases, save, clone, checkpoints, undo/redo, audit trail |
 | Revenue Management | Segment and channel economics, pace, displacement, rate search, MLOS, overbooking, forecast accuracy |
 | FP&A and Variances | F/U classification, materiality, price/volume/mix, flexible budget, action plans, forecast versions |
@@ -86,7 +117,7 @@ Requirements: Windows 10 or 11, 64-bit. To check an installation at any time, ru
 | Modelling Workbench | Models A–H, dependency viewer, safe custom formulas, model warnings |
 | Sensitivity and Risk | One-way, two-way, tornado, break-even, scenarios, Monte Carlo, forecast error |
 | Investment Cases | Six business cases with NPV, IRR, MIRR, payback, discounted payback, PI and sensitivities |
-| Executive Decision Room | Nine cases in seven steps, five-dimension rubric, outcome reveal and next investigations |
+| Boardroom Cases | Nine cases in seven steps, five-dimension rubric, outcome reveal and next investigations |
 | Learning Path | Explanations, engine-backed worked examples, guided and independent exercises, applied tasks, checks |
 | Excel Lab | Four generated workbooks with reference answers; grades a **copy** of your file, never the original |
 | Capstone | Messy but recoverable dataset, ten scored steps, meeting defence |
@@ -128,7 +159,7 @@ QT_QPA_PLATFORM=offscreen pytest      # Windows PowerShell: $env:QT_QPA_PLATFORM
 These work the same for `python run_aurelia.py` and the `.exe`:
 
 ```
---selftest [--report FILE] [--quiet]   run the built-in self-test (14 checks) and write a diagnostic report
+--selftest [--report FILE] [--quiet]   run the built-in self-test (15 checks) and write a diagnostic report
 --generate-workbooks DIR               write the four Excel practice workbooks to DIR
 --data-dir DIR                         use a specific data folder (portable mode)
 --smoke-ui                             open every page off-screen and exit
@@ -167,9 +198,11 @@ aurelia/            application package
   learning/         content, competency rules, coach, glossary and search
   reports/          management report, Excel exports, portfolio
   persistence/      SQLite storage, backup and restore
-  ui/               PySide6 main window, pages, widgets, themes, onboarding
+  game/             Season mode: monthly turns, briefing cards, scoring, objectives, titles
+  ui/               PySide6 main window, pages, painted visuals, icons, themes, onboarding
+  assets/fonts/     Manrope and Fraunces (SIL Open Font License)
   selftest.py       --selftest checks and diagnostic report
-tests/              pytest suite (166 tests: engine, finance, analysis, Excel, learning, UI)
+tests/              pytest suite (179 tests: engine, finance, analysis, season, Excel, learning, UI)
 packaging/          PyInstaller spec and Windows version resource
 tools/              documentation generator
 sample_data/        fictional sample workbooks, capstone CSVs and a statement export
@@ -179,5 +212,6 @@ sample_data/        fictional sample workbooks, capstone CSVs and a statement ex
 ## ⚖️ Disclaimer
 
 Aurelia Finance Lab is an educational simulator. *The Aurelia Grand*, *Aurelia Oasis* and *Aurelia Hospitality
-Group* are fictional, and all figures are simulated. Nothing in the app is financial, investment or career
+Group* are fictional, and all figures are simulated. The Manrope and Fraunces typefaces are bundled under the
+SIL Open Font License (see `aurelia/assets/fonts/`). Nothing in the app is financial, investment or career
 advice, and practice scores are not a professional qualification.

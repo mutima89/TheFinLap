@@ -55,3 +55,11 @@
 * PDF reports use Qt's rich-text renderer: layout is simple (A4, tables, headings) rather than typeset.
 * Monte Carlo runs the full engine per iteration; large iteration counts take noticeable time.
 * There is no automatic update mechanism (by design: the app makes no network connections).
+
+## Season mode
+
+* Each month of a season is simulated from the Base case opening balance sheet. The season tracks cash itself as
+  opening cash plus each played month's net cash flow, so working-capital timing of earlier decisions is not
+  carried into later months.
+* Briefing cards come from a fixed, fictional set (8 market, 6 decision and 5 issue cards) and their effects are
+  training assumptions, not estimates of how real guests, accounts or suppliers behave.

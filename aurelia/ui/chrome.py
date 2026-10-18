@@ -53,6 +53,7 @@ class SeasonStrip(QWidget):
         self.month_lbl = label("", "Muted")
         h.addWidget(self.track)
         h.addWidget(self.month_lbl)
+        self.month_lbl.setMinimumWidth(self.month_lbl.fontMetrics().horizontalAdvance("Season complete") + 6)
         h.addStretch(1)
         self.cash = _Stat("Cash")
         self.guest = _Stat("Guest score")
@@ -78,7 +79,7 @@ class SeasonStrip(QWidget):
         self.setVisible(True)
         self.track.set(s["states"])
         self.month_lbl.setText("Season complete" if s["finished"]
-                               else f"{MONTHS[s['month'] - 1]} · month {s['month']} of 12")
+                               else f"{MONTHS[s['month'] - 1][:3]} · month {s['month']} of 12")
         self.cash.val.setText(short_money(s["cash"]) if s["cash"] is not None else "SAR —")
         self.guest.val.setText(f"{s['guest']:.1f} / 5")
         self.conf.val.setText(f"{s['confidence']:.0f}")
